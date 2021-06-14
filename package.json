@@ -43,6 +43,7 @@
     "enzyme-adapter-react-16": "^1.15.4",
     "enzyme-to-json": "^3.5.0",
     "express": "^4.17.1",
+    "firebase": "^8.6.7",
     "fix-path": "^3.0.0",
     "jest": "^26.4.2",
     "node-fetch": "^2.6.1",
@@ -88,7 +89,8 @@
       "react-redux"
     ],
     "main": {
-      "sourceDirectory": "src/main"
+      "sourceDirectory": "src/main",
+      "extraEntries": ["@/preload.js"] //filler
     },
     "renderer": {
       "sourceDirectory": "src/renderer",
