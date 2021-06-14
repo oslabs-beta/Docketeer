@@ -89,8 +89,7 @@
       "react-redux"
     ],
     "main": {
-      "sourceDirectory": "src/main",
-      "extraEntries": ["@/preload.js"] //filler
+      "sourceDirectory": "src/main"
     },
     "renderer": {
       "sourceDirectory": "src/renderer",

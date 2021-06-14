@@ -14,7 +14,26 @@ import { BrowserRouter as Router, Switch, Route, Redirect, BrowserHistory } from
 import App from '../App';
 import SignupModal from './signupModal';
 import DebugRouter from '../debug/debugRouter';
+// Firebase App (the core Firebase SDK) is always required and must be listed first
+import firebase from "firebase/app";
+// Add the Firebase products that you want to use
+import "firebase/auth";
 
+const firebaseConfig = {
+    apiKey: "AIzaSyAC8yoPq0llly4nbI-JOcYTglUhr2XhBkk",
+    authDomain: "docketeer3-ef822.firebaseapp.com",
+    projectId: "docketeer3-ef822",
+    storageBucket: "docketeer3-ef822.appspot.com",
+    messagingSenderId: "517219389795",
+    appId: "1:517219389795:web:9a8dbd2232d94984dd4356",
+    measurementId: "G-6MYEZ6RL7V"
+  };
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+
+// Get the Auth service for the default app
+var defaultAuth = firebase.auth();
 
 const Login = () => {
   
