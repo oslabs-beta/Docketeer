@@ -1,23 +1,23 @@
 // module imports
-import React, { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { HashRouter as Router, Switch, Route, Link } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { HashRouter as Router, Switch, Route, Link, Redirect } from 'react-router-dom';
 
 // static imports
-import * as actions from "../../actions/actions";
-import * as helper from "../helper/commands";
-import Docketeer from "../../../assets/docketeer-title.png";
+import * as actions from '../../actions/actions';
+import * as helper from '../helper/commands';
+import Docketeer from '../../../assets/docketeer-title.png';
 
 // tab component imports
-import Metrics from "../tabs/Metrics";
-import Images from "../tabs/Images";
-import Yml from "../tabs/Yml";
-import Containers from "../tabs/Containers";
-import Settings from "../tabs/Settings";
+import Metrics from '../tabs/Metrics';
+import Images from '../tabs/Images';
+import Yml from '../tabs/Yml';
+import Containers from '../tabs/Containers';
+import Settings from '../tabs/Settings';
 
 // helper function imports
-import startNotificationRequester from "../helper/notificationsRequester";
-import initDatabase from "../helper/initDatabase";
+import startNotificationRequester from '../helper/notificationsRequester';
+import initDatabase from '../helper/initDatabase';
 
 /**
  * Container component that has all redux logic along with react router
@@ -33,7 +33,8 @@ const UserView = (props) => {
   const removeContainer = (id) => dispatch(actions.removeContainer(id));
   const runStoppedContainer = (data) => dispatch(actions.runStoppedContainer(data));
   const stopRunningContainer = (id) => dispatch(actions.stopRunningContainer(id));
-
+  const updateSession = () => dispatch(actions.updateSession());
+  const logoutUser = () => dispatch(actions.logoutUser());
   // map state to props
   const runningList = useSelector((state) => state.containersList.runningList);
   const stoppedList = useSelector((state) => state.containersList.stoppedList);
@@ -45,10 +46,16 @@ const UserView = (props) => {
   const memoryNotificationList = useSelector((state) => state.notificationList.memoryNotificationList);
   const cpuNotificationList = useSelector((state) => state.notificationList.cpuNotificationList);
   const stoppedNotificationList = useSelector((state) => state.notificationList.stoppedNotificationList);
-
+  
   // declare a local state variable called selected, initialize to "/"
-  const [selected, setSelected] = useState("/");
-  const [ loggedIn, setLoggedIn ] = useState(false);
+  const [selected, setSelected] = useState('/');
+  // const [ loggedIn, setLoggedIn ] = useState(true);
+
+  const handleLogout = (e) => {
+    updateSession();
+    logoutUser();
+    // props.setLoggedIn(false);
+  };
 
   useEffect(() => {
     initDatabase();
@@ -74,10 +81,10 @@ const UserView = (props) => {
   }, []);
 
   const selectedStyling = {
-    background: "#e1e4e6",
-    color: "#042331",
-    borderTopRightRadius: "10px",
-    borderBottomRightRadius: "10px",
+    background: '#e1e4e6',
+    color: '#042331',
+    borderTopRightRadius: '10px',
+    borderBottomRightRadius: '10px',
   };
 
   return (
@@ -92,8 +99,8 @@ const UserView = (props) => {
               <li>
                 <Link
                   to="/app"
-                  style={selected === "/" ? selectedStyling : null}
-                  onClick={() => setSelected("/")}
+                  style={selected === '/' ? selectedStyling : null}
+                  onClick={() => setSelected('/')}
                 >
                   <i className="fas fa-settings"></i> Settings
                 </Link>
@@ -101,8 +108,8 @@ const UserView = (props) => {
               <li>
                 <Link
                   to="/running"
-                  style={selected === "/running" ? selectedStyling : null}
-                  onClick={() => setSelected(() => "/running")}
+                  style={selected === '/running' ? selectedStyling : null}
+                  onClick={() => setSelected(() => '/running')}
                 >
                   <i className="fas fa-box-open"></i> Containers
                 </Link>
@@ -110,8 +117,8 @@ const UserView = (props) => {
               <li>
                 <Link
                   to="/images"
-                  style={selected === "/images" ? selectedStyling : null}
-                  onClick={() => setSelected("/images")}
+                  style={selected === '/images' ? selectedStyling : null}
+                  onClick={() => setSelected('/images')}
                 >
                   <i className="fas fa-database"></i> Images
                 </Link>
@@ -119,8 +126,8 @@ const UserView = (props) => {
               <li>
                 <Link
                   to="/metrics"
-                  style={selected === "/metrics" ? selectedStyling : null}
-                  onClick={() => setSelected("/metrics")}
+                  style={selected === '/metrics' ? selectedStyling : null}
+                  onClick={() => setSelected('/metrics')}
                 >
                   <i className="fas fa-chart-pie"></i> Metrics
                 </Link>
@@ -128,8 +135,8 @@ const UserView = (props) => {
               <li>
                 <Link
                   to="/yml"
-                  style={selected === "/yml" ? selectedStyling : null}
-                  onClick={() => setSelected("/yml")}
+                  style={selected === '/yml' ? selectedStyling : null}
+                  onClick={() => setSelected('/yml')}
                 >
                   <i className="fas fa-file-upload"></i> Docker Compose
                 </Link>
@@ -144,7 +151,7 @@ const UserView = (props) => {
               </button><span> </span> 
               <button
                 className="btn"
-                onClick={(e) => console.log('hello')}
+                onClick={(e) => handleLogout(e)}
               >
                 Logout
               </button>

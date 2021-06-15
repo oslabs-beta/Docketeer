@@ -1,7 +1,7 @@
 /* eslint-disable implicit-arrow-linebreak */
-import { ipcRenderer } from "electron";
-import store from "../../renderer/store";
-import * as categories from "../../constants/notificationCategories";
+import { ipcRenderer } from 'electron';
+import store from '../../renderer/store';
+import * as categories from '../../constants/notificationCategories';
 
 // object that holds what notifications have been sent
 const sentNotifications = {};
@@ -15,9 +15,9 @@ const RESEND_INTERVAL = 60; // seconds
 
 const getTargetStat = (containerObject, notificationSettingType) => {
   if (notificationSettingType === categories.MEMORY)
-    return parseFloat(containerObject.mp.replace("%", ""));
+    return parseFloat(containerObject.mp.replace('%', ''));
   if (notificationSettingType === categories.CPU)
-    return parseFloat(containerObject.cpu.replace("%", ""));
+    return parseFloat(containerObject.cpu.replace('%', ''));
   if (notificationSettingType === categories.STOPPED) return 1;
 };
 
@@ -48,17 +48,17 @@ const constructNotificationMessage = (
   triggeringValue,
   containerId
 ) => {
-  let message = "";
+  let message = '';
   switch (notificationType) {
-    case categories.STOPPED:
-      message = `Container with ID of ${containerId} has stopped`;
-      break;
-    case categories.CPU || categories.MEMORY:
-      message = `${notificationType} alert for container with ID of ${containerId}. Current Value: ${stat}; Alert Setting: ${triggeringValue}`;
-      break;
-    default:
-      message = `${notificationType} alert for container with ID of ${containerId}. Current Value: ${stat}; Alert Setting: ${triggeringValue}`;
-      break;
+  case categories.STOPPED:
+    message = `Container with ID of ${containerId} has stopped`;
+    break;
+  case categories.CPU || categories.MEMORY:
+    message = `${notificationType} alert for container with ID of ${containerId}. Current Value: ${stat}; Alert Setting: ${triggeringValue}`;
+    break;
+  default:
+    message = `${notificationType} alert for container with ID of ${containerId}. Current Value: ${stat}; Alert Setting: ${triggeringValue}`;
+    break;
   }
 
   return message;
@@ -82,7 +82,7 @@ const sendNotification = async (
     ),
   };
 
-  await ipcRenderer.invoke("post-event", body);
+  await ipcRenderer.invoke('post-event', body);
 };
 
 /**
@@ -123,7 +123,7 @@ const checkForNotifications = (
           );
 
           // calculate time between now and last notification sent time
-          let spentTime = Math.floor(
+          const spentTime = Math.floor(
             (Date.now() - notificationLastSent) / 1000
           );
 
@@ -139,7 +139,7 @@ const checkForNotifications = (
             console.log(
               `** Notification SENT. ${notificationType} containerId: ${containerId} stat: ${stat} triggeringValue: ${triggeringValue} spentTime: ${spentTime}`
             );
-            console.log("sentNofications: ", sentNotifications);
+            console.log('sentNofications: ', sentNotifications);
 
             // update date.now in object that stores sent notifications
             sentNotifications[notificationType][containerId] = Date.now();

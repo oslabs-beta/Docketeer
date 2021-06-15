@@ -1,4 +1,4 @@
-import * as types from "../constants/actionTypes";
+import * as types from '../constants/actionTypes';
 
 const initialState = {
   name: '',
@@ -15,34 +15,34 @@ const initialState = {
 
 export default function (state = initialState, action) {
   switch (action.type) {
-    case types.UPDATE_ALL: {
-      
-    }
-    case types.UPDATE_NAME: {
-
-    }
-    case types.UPDATE_EMAIL: {
-
-    }
-    case types.UPDATE_PHONE: {
-
-    }
-    case types.UPDATE_ROLE: {
-
-    }
-    case types.UPDATE_CONTACT_PREF: {
-
-    }
-    case types.UPDATE_MEM_THRESHOLD: {
-
-    }
-    case types.UPDATE_CPU_THRESHOLD: {
-
-    }
-    case types.UPDATE_CONTAINER_STOPS: {
-
-    }
-    default:
-      return state;
+  case types.UPDATE_ALL: {
+    return; 
+  }
+  case types.UPDATE_NAME: {
+    return;
+  }
+  case types.UPDATE_EMAIL: {
+    return;
+  }
+  case types.UPDATE_PHONE: {
+    return;
+  }
+  case types.UPDATE_ROLE: {
+    return;
+  }
+  case types.UPDATE_CONTACT_PREF: {
+    return;
+  }
+  case types.UPDATE_MEM_THRESHOLD: {
+    return;
+  }
+  case types.UPDATE_CPU_THRESHOLD: {
+    return;
+  }
+  case types.UPDATE_CONTAINER_STOPS: {
+    return;
+  }
+  default:
+    return state;
   }
 }

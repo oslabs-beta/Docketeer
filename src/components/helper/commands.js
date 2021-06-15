@@ -1,7 +1,7 @@
-import { exec } from "child_process";
-import query from "./psqlQuery";
-import parseContainerFormat from "./parseContainerFormat";
-import store from "../../renderer/store";
+import { exec } from 'child_process';
+import query from './psqlQuery';
+import parseContainerFormat from './parseContainerFormat';
+import store from '../../renderer/store';
 /**
  *
  * @param {*} runningList
@@ -12,7 +12,7 @@ import store from "../../renderer/store";
 // docker stats --no-stream --format "{{ json . }}"
 export const addRunning = (runningList, callback) => {
   exec(
-    `docker stats --no-stream --format "{{json .}},"`,
+    'docker stats --no-stream --format "{{json .}},"',
     (error, stdout, stderr) => {
       if (error) {
         alert(`${error.message}`);
@@ -23,7 +23,7 @@ export const addRunning = (runningList, callback) => {
         return;
       }
       // trim whitespace at end out stdout,slice to remove trailing comma and remove spaces
-      const dockerOutput = stdout.trim().slice(0, -1).replaceAll(" ", "");
+      const dockerOutput = stdout.trim().slice(0, -1).replaceAll(' ', '');
       const output = `[${dockerOutput}]`;
       const convertedValue = JSON.parse(output);
       const newList = [];
@@ -36,9 +36,9 @@ export const addRunning = (runningList, callback) => {
             break;
           }
         }
-        isInTheList ? "" : newList.push(convertedValue[i]);
+        isInTheList ? '' : newList.push(convertedValue[i]);
       }
-      newList.length ? callback(newList) : "";
+      newList.length ? callback(newList) : '';
     }
   );
 };
@@ -51,7 +51,7 @@ export const addRunning = (runningList, callback) => {
  */
 export const refreshRunning = (refreshRunningContainers) => {
   exec(
-    `docker stats --no-stream --format "{{json .}},"`,
+    'docker stats --no-stream --format "{{json .}},"',
 
     (error, stdout, stderr) => {
       if (error) {
@@ -66,7 +66,7 @@ export const refreshRunning = (refreshRunningContainers) => {
       const dockerOutput = `[${stdout
         .trim()
         .slice(0, -1)
-        .replaceAll(" ", "")}]`;
+        .replaceAll(' ', '')}]`;
       // const output = `[${dockerOutput}]`;
       const convertedValue = JSON.parse(dockerOutput);
 
@@ -82,7 +82,7 @@ export const refreshRunning = (refreshRunningContainers) => {
  */
 export const refreshStopped = (refreshStoppedContainers) => {
   exec(
-    `docker ps -f "status=exited" --format "{{json .}},"`,
+    'docker ps -f "status=exited" --format "{{json .}},"',
     (error, stdout, stderr) => {
       if (error) {
         alert(`${error.message}`);
@@ -107,7 +107,7 @@ export const refreshStopped = (refreshStoppedContainers) => {
  * Images will be refreshed every time
  */
 export const refreshImages = (callback) => {
-  exec(`docker images`, (error, stdout, stderr) => {
+  exec('docker images', (error, stdout, stderr) => {
     if (error) {
       alert(`${error.message}`);
       return;
@@ -116,12 +116,12 @@ export const refreshImages = (callback) => {
       console.log(`stderr: ${stderr}`);
       return;
     }
-    let value = parseContainerFormat.convert(stdout);
-    let objArray = ["reps", "tag", "imgid", "size"];
+    const value = parseContainerFormat.convert(stdout);
+    const objArray = ['reps', 'tag', 'imgid', 'size'];
     const resultImages = [];
     for (let i = 0; i < value.length; i++) {
-      let innerArray = [];
-      if (value[i][0] !== "<none>") {
+      const innerArray = [];
+      if (value[i][0] !== '<none>') {
         innerArray.push(value[i][0]);
         innerArray.push(value[i][1]);
         innerArray.push(value[i][2]);
@@ -129,7 +129,7 @@ export const refreshImages = (callback) => {
         resultImages.push(innerArray);
       }
     }
-    let convertedValue = parseContainerFormat.convertArrToObj(
+    const convertedValue = parseContainerFormat.convertArrToObj(
       resultImages,
       objArray
     );
@@ -240,7 +240,7 @@ export const removeIm = (id, imagesList, callback_1, callback_2) => {
     if (error) {
       alert(
         `${error.message}` +
-          "\nPlease stop running container first then remove."
+          '\nPlease stop running container first then remove.'
       );
       return;
     }
@@ -259,7 +259,7 @@ export const removeIm = (id, imagesList, callback_1, callback_2) => {
  */
 export const handlePruneClick = (e) => {
   e.preventDefault();
-  exec("docker system prune --force", (error, stdout, stderr) => {
+  exec('docker system prune --force', (error, stdout, stderr) => {
     if (error) {
       alert(`${error.message}`);
       return;
@@ -296,7 +296,7 @@ export const pullImage = (repo) => {
  */
 export const networkContainers = (getDockerNetworkReducer) => {
   // exec("docker network ls", (error, stdout, stderr) => {
-  exec(`docker network ls --format "{{json .}},"`, (error, stdout, stderr) => {
+  exec('docker network ls --format "{{json .}},"', (error, stdout, stderr) => {
     if (error) {
       console.log(`error: ${error.message}`);
       return;
@@ -307,10 +307,10 @@ export const networkContainers = (getDockerNetworkReducer) => {
     }
 
     // trim whitespace at end out stdout,slice to remove trailing comma and remove spaces
-    const dockerOutput = `[${stdout.trim().slice(0, -1).replaceAll(" ", "")}]`;
+    const dockerOutput = `[${stdout.trim().slice(0, -1).replaceAll(' ', '')}]`;
     // remove docker network defaults named: bridge, host, and none
     const networkContainers = JSON.parse(dockerOutput).filter(
-      ({ Name }) => Name !== "bridge" && Name !== "host" && Name !== "none"
+      ({ Name }) => Name !== 'bridge' && Name !== 'host' && Name !== 'none'
     );
     // dispatch the network containers to the redux store
     getDockerNetworkReducer(networkContainers);
@@ -355,7 +355,7 @@ export const dockerComposeUp = (fileLocation) => {
 export const dockerComposeStacks = (getComposeStacksReducer, filePath) => {
   if (getComposeStacksReducer && filePath) {
     exec(
-      `docker network ls --filter "label=com.docker.compose.network" --format "{{json .}},"`,
+      'docker network ls --filter "label=com.docker.compose.network" --format "{{json .}},"',
       (error, stdout, stderr) => {
         if (error) {
           console.log(`error: ${error.message}`);
@@ -368,7 +368,7 @@ export const dockerComposeStacks = (getComposeStacksReducer, filePath) => {
         const dockerOutput = `[${stdout
           .trim()
           .slice(0, -1)
-          .replaceAll(" ", "")}]`;
+          .replaceAll(' ', '')}]`;
         const parseDockerOutput = JSON.parse(dockerOutput);
         parseDockerOutput[parseDockerOutput.length - 1].FilePath = filePath;
 
@@ -377,7 +377,7 @@ export const dockerComposeStacks = (getComposeStacksReducer, filePath) => {
     );
   } else {
     exec(
-      `docker network ls --filter "label=com.docker.compose.network" --format "{{json .}},"`,
+      'docker network ls --filter "label=com.docker.compose.network" --format "{{json .}},"',
       (error, stdout, stderr) => {
         if (error) {
           console.log(`error: ${error.message}`);
@@ -390,7 +390,7 @@ export const dockerComposeStacks = (getComposeStacksReducer, filePath) => {
         const dockerOutput = `[${stdout
           .trim()
           .slice(0, -1)
-          .replaceAll(" ", "")}]`;
+          .replaceAll(' ', '')}]`;
         const parseDockerOutput = JSON.parse(dockerOutput);
         getComposeStacksReducer(parseDockerOutput);
       }
@@ -422,26 +422,26 @@ export const dockerComposeDown = (filePath) => {
 
 export const writeToDb = () => {
   const interval = 300000;
-	setInterval(() => {
-		let state = store.getState();
-    let runningContainers = state.containersList.runningList;
-    let stoppedContainers = state.containersList.stoppedList;
-		if (!runningContainers.length) return;
-		let dbQuery = `insert into metrics (container_id, container_name, cpu_pct, memory_pct, memory_usage, net_io, block_io, pid, created_at) values `
-		runningContainers.forEach((container, idx) => {
-			// no need to worry about sql injections as it would be self sabotaging! 
-			let string = `('${container.ID}', '${container.Name}', '${container.CPUPerc}', '${container.MemPerc}', '${container.MemUsage}', '${container.NetIO}', '${container.BlockIO}', '${container.PIDs}', current_timestamp)`
-			if (idx === runningContainers.length - 1 && stoppedContainers.length === 0) dbQuery += string;
-			else dbQuery += string + ', ';
-    })
+  setInterval(() => {
+    const state = store.getState();
+    const runningContainers = state.containersList.runningList;
+    const stoppedContainers = state.containersList.stoppedList;
+    if (!runningContainers.length) return;
+    let dbQuery = 'insert into metrics (container_id, container_name, cpu_pct, memory_pct, memory_usage, net_io, block_io, pid, created_at) values ';
+    runningContainers.forEach((container, idx) => {
+      // no need to worry about sql injections as it would be self sabotaging! 
+      const string = `('${container.ID}', '${container.Name}', '${container.CPUPerc}', '${container.MemPerc}', '${container.MemUsage}', '${container.NetIO}', '${container.BlockIO}', '${container.PIDs}', current_timestamp)`;
+      if (idx === runningContainers.length - 1 && stoppedContainers.length === 0) dbQuery += string;
+      else dbQuery += string + ', ';
+    });
     stoppedContainers.forEach((container, idx) => {
-      let string = `('${container.ID}', '${container.Names}', '0.00%', '0.00%', '00.0MiB/0.00GiB', '0.00kB/0.00kB', '00.0MB/00.0MB', '0', current_timestamp)`
+      const string = `('${container.ID}', '${container.Names}', '0.00%', '0.00%', '00.0MiB/0.00GiB', '0.00kB/0.00kB', '00.0MB/00.0MB', '0', current_timestamp)`;
       if (idx === stoppedContainers.length - 1) dbQuery += string;
       else dbQuery += string + ', ';
-    })
-		query(dbQuery)
-	}, interval)
-}
+    });
+    query(dbQuery);
+  }, interval);
+};
 
 export const setDbSessionTimeZone = () => {
   const currentTime = new Date();

@@ -1,30 +1,28 @@
 // module imports
-import React, { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { HashRouter as Router, Switch, Route, Link, Redirect } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { HashRouter as Router, Switch, Route, Link, Redirect } from 'react-router-dom';
 
 // static imports
-import * as actions from "../../actions/actions";
-import * as helper from "../helper/commands";
-import Docketeer from "../../../assets/docketeer-title.png";
+import * as actions from '../../actions/actions';
+import * as helper from '../helper/commands';
+import Docketeer from '../../../assets/docketeer-title.png';
 
 // tab component imports
-import Metrics from "../tabs/Metrics";
-import Images from "../tabs/Images";
-import Yml from "../tabs/Yml";
-import Containers from "../tabs/Containers";
-import Settings from "../tabs/Settings";
+import Metrics from '../tabs/Metrics';
+import Images from '../tabs/Images';
+import Yml from '../tabs/Yml';
+import Containers from '../tabs/Containers';
+import Settings from '../tabs/Settings';
 
 // helper function imports
-import startNotificationRequester from "../helper/notificationsRequester";
-import initDatabase from "../helper/initDatabase";
-
-import Login from "../login/login";
+import startNotificationRequester from '../helper/notificationsRequester';
+import initDatabase from '../helper/initDatabase';
 
 /**
  * Container component that has all redux logic along with react router
  */
-const AdminView = () => {
+const AdminView = (props) => {
   const dispatch = useDispatch();
   const addRunningContainers = (data) => dispatch(actions.addRunningContainers(data));
   const refreshRunningContainers = (data) => dispatch(actions.refreshRunningContainers(data));
@@ -35,7 +33,8 @@ const AdminView = () => {
   const removeContainer = (id) => dispatch(actions.removeContainer(id));
   const runStoppedContainer = (data) => dispatch(actions.runStoppedContainer(data));
   const stopRunningContainer = (id) => dispatch(actions.stopRunningContainer(id));
-
+  const updateSession = () => dispatch(actions.updateSession());
+  const logoutUser = () => dispatch(actions.logoutUser());
   // map state to props
   const runningList = useSelector((state) => state.containersList.runningList);
   const stoppedList = useSelector((state) => state.containersList.stoppedList);
@@ -49,11 +48,13 @@ const AdminView = () => {
   const stoppedNotificationList = useSelector((state) => state.notificationList.stoppedNotificationList);
   
   // declare a local state variable called selected, initialize to "/"
-  const [selected, setSelected] = useState("/");
-  const [ loggedIn, setLoggedIn ] = useState(true);
+  const [selected, setSelected] = useState('/');
+  // const [ loggedIn, setLoggedIn ] = useState(true);
 
   const handleLogout = (e) => {
-    setLoggedIn(false);
+    updateSession();
+    logoutUser();
+    // props.setLoggedIn(false);
   };
 
   useEffect(() => {
@@ -80,23 +81,12 @@ const AdminView = () => {
   }, []);
 
   const selectedStyling = {
-    background: "#e1e4e6",
-    color: "#042331",
-    borderTopRightRadius: "10px",
-    borderBottomRightRadius: "10px",
+    background: '#e1e4e6',
+    color: '#042331',
+    borderTopRightRadius: '10px',
+    borderBottomRightRadius: '10px',
   };
 
-  if (!loggedIn) {
-    console.log('loggedOut');
-    return (
-      <Router>
-        <Redirect to="/"/>
-        <Switch>
-          <Route component={Login} exact path="/" />
-        </Switch>
-      </Router>
-    )
-  }
   return (
     <Router>
       <div className="container">
@@ -109,17 +99,17 @@ const AdminView = () => {
               <li>
                 <Link
                   to="/app"
-                  style={selected === "/" ? selectedStyling : null}
-                  onClick={() => setSelected("/")}
+                  style={selected === '/' ? selectedStyling : null}
+                  onClick={() => setSelected('/')}
                 >
                   <i className="fas fa-settings"></i> Settings
                 </Link>
               </li>
               <li>
-              <Link
+                <Link
                   to="/users"
-                  style={selected === "/users" ? selectedStyling : null}
-                  onClick={() => setSelected("/users")}
+                  style={selected === '/users' ? selectedStyling : null}
+                  onClick={() => setSelected('/users')}
                 >
                   <i className="fas fa-settings"></i> Users
                 </Link>
@@ -127,8 +117,8 @@ const AdminView = () => {
               <li>
                 <Link
                   to="/running"
-                  style={selected === "/running" ? selectedStyling : null}
-                  onClick={() => setSelected(() => "/running")}
+                  style={selected === '/running' ? selectedStyling : null}
+                  onClick={() => setSelected(() => '/running')}
                 >
                   <i className="fas fa-box-open"></i> Containers
                 </Link>
@@ -136,8 +126,8 @@ const AdminView = () => {
               <li>
                 <Link
                   to="/images"
-                  style={selected === "/images" ? selectedStyling : null}
-                  onClick={() => setSelected("/images")}
+                  style={selected === '/images' ? selectedStyling : null}
+                  onClick={() => setSelected('/images')}
                 >
                   <i className="fas fa-database"></i> Images
                 </Link>
@@ -145,8 +135,8 @@ const AdminView = () => {
               <li>
                 <Link
                   to="/metrics"
-                  style={selected === "/metrics" ? selectedStyling : null}
-                  onClick={() => setSelected("/metrics")}
+                  style={selected === '/metrics' ? selectedStyling : null}
+                  onClick={() => setSelected('/metrics')}
                 >
                   <i className="fas fa-chart-pie"></i> Metrics
                 </Link>
@@ -154,8 +144,8 @@ const AdminView = () => {
               <li>
                 <Link
                   to="/yml"
-                  style={selected === "/yml" ? selectedStyling : null}
-                  onClick={() => setSelected("/yml")}
+                  style={selected === '/yml' ? selectedStyling : null}
+                  onClick={() => setSelected('/yml')}
                 >
                   <i className="fas fa-file-upload"></i> Docker Compose
                 </Link>
@@ -183,6 +173,9 @@ const AdminView = () => {
         <Switch>
           <Route path="/metrics">
             <Metrics runningList={runningList} />
+          </Route>
+          <Route path="/users">
+            
           </Route>
           <Route path="/yml">
             <Yml networkList={networkList} composeymlFiles={composeymlFiles} />

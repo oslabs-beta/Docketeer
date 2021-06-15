@@ -24,29 +24,29 @@ userController.createUser = (req, res, next) => {
   //     });
   //   });
   
-  const createUser = `INSERT INTO users (username, email, password, phone) VALUES ($1, $2, $3, $4) RETURNING _id;`;
+  const createUser = 'INSERT INTO users (username, email, password, phone) VALUES ($1, $2, $3, $4) RETURNING _id;';
   const userDetails = [username, email, password, phone];
 
   if (username && password) {
     db.query(createUser, userDetails)
-    .then((data) => {
-      res.locals.id = data.rows[0]._id;
-      console.log('user added');
-      return next();
-    })
-    .catch((err) => {
-      return next({
-        log: `Error in userController newUser: ${err}`,
-        message: { err: 'An error occured creating new user in database. See userController.newUser.' },
+      .then((data) => {
+        res.locals.id = data.rows[0]._id;
+        console.log('user added');
+        return next();
+      })
+      .catch((err) => {
+        return next({
+          log: `Error in userController newUser: ${err}`,
+          message: { err: 'An error occured creating new user in database. See userController.newUser.' },
+        });
       });
-    });
   }
-}
+};
 
 // get all users (system admin)
 userController.getAllUsers = (req, res, next) => {
   console.log('made it to userController.getUsers');
-  const allUsers = `SELECT * FROM users;`;
+  const allUsers = 'SELECT * FROM users;';
 
   db.query(allUsers)
     .then((response) => {
@@ -60,7 +60,7 @@ userController.getAllUsers = (req, res, next) => {
         message: { err: 'An error occured retrieving all users from database. See userController.getUsers.' },
       });
     });
-}
+};
 
 // verify user
 userController.verifyUser = (req, res, next) => {
@@ -75,16 +75,20 @@ userController.verifyUser = (req, res, next) => {
 
   db.query(checkUser)
     .then((data) => {
+      // console.log(data);
+      console.log('password: ', data.rows[0].password);
       if (data.rows[0].password === password) {
-        res.locals.id = data.rows[0]._id;
+        res.locals.user = data.rows[0];
         return next();
       } else {
+        console.log('ERROR');
         res.locals.error = 'Incorrect username or password.';
         return next();
       }
     })
     .catch((err) => {
       res.locals.error = err;
+      console.log('LAST ERROR');
       return next({
         log: `Error in userController verifyUser: ${err}`,
         message: { err: 'An error occured verifying user. See userController.verifyUser.' },

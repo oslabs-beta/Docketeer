@@ -8,9 +8,17 @@
  *
  * ************************************
  */
+
+// NPM Module Imports
 import React, { useEffect, useState } from 'react';
-import Modal from 'react-modal';
 import { BrowserRouter as Router, Switch, Route, Redirect, BrowserHistory } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import Modal from 'react-modal';
+
+// Redux Imports (actions)
+import * as actions from '../../actions/actions';
+
+// React Component Imports
 import App from '../App';
 import SignupModal from './signupModal';
 import DebugRouter from '../debug/debugRouter';
@@ -68,6 +76,8 @@ function onSignIn(googleUser) {
   });
 }
 
+// Helper Functions Import
+// import { handleLogin, authenticateUser } from '../helper/loginHelper';
 
 
 function isUserEqual(googleUser, firebaseUser) {
@@ -111,18 +121,25 @@ function isUserEqual(googleUser, firebaseUser) {
 
 const Login = () => {
   
-  // Need to set the app element to body for screen-readers (disability), otherwise modal will throw an error
-  useEffect(() => {
-    Modal.setAppElement('body');
-  }, []);
+  // React-Redux: Map dispatch to props
+  const dispatch = useDispatch();
+  const updateSession = () => dispatch(actions.updateSession());
+  const updateUser = (userInfo) => dispatch(actions.updateUser(userInfo));
 
-  // Local state variables 
-  const [ loggedIn, setLoggedIn ] = useState(false);
+  // React-Redux: Map state to props
+  const session = useSelector((state) => state.session.isLoggedIn);
+
+  // React Hooks: Local state variables 
   const [ modalIsOpen, setIsOpen ] = useState(false);
 
   // Modal functions
   const openModal = () => setIsOpen(true);
   const closeModal = () => setIsOpen(false);
+  
+  // Need to set the app element to body for screen-readers (disability), otherwise modal will throw an error
+  useEffect(() => {
+    Modal.setAppElement('body');
+  }, []);
   
   // callback function invoked when 'login' button is clicked
   const handleLogin = (e) => {
@@ -138,57 +155,60 @@ const Login = () => {
 
     console.log('clicked');
     authenticateUser(username, password);
-  }
-
-  function getAuthResponse(){
-    window.alert('booty, booty, booty, booty')
-  }
+  };
   
   // callback function which will send request to endpoint http://localhost:3000/login and expect either SSID in cookie.
   const authenticateUser = (username, password) => {
 
     fetch('http://localhost:3000/login', 
-    { 
-      method: 'POST', 
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username: username,
-        password: password
+      { 
+        method: 'POST', 
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: username,
+          password: password
+        })
       })
-    })
-    .then((response) => {
-      return response.json();
-    })
-    .then((data) => {
-      if (typeof data === 'object') {
-        window.alert(data.error);
-      }
-      else {
-        setLoggedIn(true);
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-    })
-  }
+      .then((response) => {
+        console.log(response);
+        return response.json();
+      })
+      .then((data) => {
+        if (Object.prototype.hasOwnProperty.call(data, 'error')) {
+          window.alert(data.error);
+        }
+        else {
+          console.log(data);
+          updateSession(); // loggedIn = true 
+          updateUser(data); // update user info in sessions reducer
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   // Upon successful login, redirect to /app location and render the App component
 
   // Note: this could be re-worked, just thinking about it this looks like poor security design since loggedIn is a local state variable on client end which can be hardcoded to true. Rather, the server should verify credentials and then send client either SSID to access next endpoint or another means.
-  if (loggedIn){
+  if (session){
+    console.log('LOGGED IN');
     return (
       <Router
         history={BrowserHistory}
       >
         <Redirect to="/app"/>
         <Switch>
-          <Route component={App} exact path="/app" />
-        </Switch>
+          {/* <Route component={App} exact path="/app" /> */}
+          <Route path="/app">
+            <App />
+          </Route>
+        </Switch> 
       </Router>
-    )
-  };
+    );
+  }
   
   // Else render the login page
   return (
@@ -213,7 +233,7 @@ const Login = () => {
             onRequestClose={closeModal}
             contentLabel='Modal to make user account'
           >
-            <SignupModal />
+            <SignupModal closeModal={closeModal}/>
           </Modal>
         </div>
       </Route>
