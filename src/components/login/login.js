@@ -23,19 +23,19 @@ import App from '../App';
 import SignupModal from './signupModal';
 import DebugRouter from '../debug/debugRouter';
 // Firebase App (the core Firebase SDK) is always required and must be listed first
-import firebase from "firebase/app";
+import firebase from 'firebase/app';
 // Add the Firebase products that you want to use
-import "firebase/auth";
+import 'firebase/auth';
 
 const firebaseConfig = {
-    apiKey: "AIzaSyAC8yoPq0llly4nbI-JOcYTglUhr2XhBkk",
-    authDomain: "docketeer3-ef822.firebaseapp.com",
-    projectId: "docketeer3-ef822",
-    storageBucket: "docketeer3-ef822.appspot.com",
-    messagingSenderId: "517219389795",
-    appId: "1:517219389795:web:9a8dbd2232d94984dd4356",
-    measurementId: "G-6MYEZ6RL7V"
-  };
+  apiKey: 'AIzaSyAC8yoPq0llly4nbI-JOcYTglUhr2XhBkk',
+  authDomain: 'docketeer3-ef822.firebaseapp.com',
+  projectId: 'docketeer3-ef822',
+  storageBucket: 'docketeer3-ef822.appspot.com',
+  messagingSenderId: '517219389795',
+  appId: '1:517219389795:web:9a8dbd2232d94984dd4356',
+  measurementId: 'G-6MYEZ6RL7V'
+};
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
@@ -57,7 +57,7 @@ function onSignIn(googleUser) {
       // console.log('this gosh dawg turkey doag', firebase.auth.GoogleAuthProvider.PROVIDER_ID)
       // console.log('this gosh dawg turkey bun', firebase.auth.GoogleAuthProvider.credential)
       var credential = firebase.auth.GoogleAuthProvider.credential(
-          googleUser.getAuthResponse().id_token);
+        googleUser.getAuthResponse().id_token);
 
       // Sign in with credential from the Google user.
       firebase.auth().signInWithCredential(credential).catch((error) => {
