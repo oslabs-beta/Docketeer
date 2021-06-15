@@ -1,5 +1,5 @@
 "use strict";
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, session, ipcMain } from "electron";
 import * as path from "path";
 import { format as formatUrl } from "url";
 // import server from "../../server/server.js";
@@ -30,7 +30,7 @@ function createMainWindow() {
   }
 
   if (isDevelopment) {
-    window.loadURL(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`);
+    window.loadURL(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`, {userAgent: 'Chrome'});
   } else {
     window.loadURL(
       formatUrl({

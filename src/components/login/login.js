@@ -35,6 +35,80 @@ firebase.initializeApp(firebaseConfig);
 // Get the Auth service for the default app
 var defaultAuth = firebase.auth();
 
+// var provider = new firebase.auth.GoogleAuthProvider();
+
+
+function onSignIn(googleUser) {
+  console.log('Google Auth Response', googleUser);
+  // We need to register an Observer on Firebase Auth to make sure auth is initialized.
+  var unsubscribe = firebase.auth().onAuthStateChanged((firebaseUser) => {
+    unsubscribe();
+    // Check if we are already signed-in Firebase with the correct user.
+    if (!isUserEqual(googleUser, firebaseUser)) {
+      // Build Firebase credential with the Google ID token.
+      // console.log('this gosh dawg turkey doag', firebase.auth.GoogleAuthProvider.PROVIDER_ID)
+      // console.log('this gosh dawg turkey bun', firebase.auth.GoogleAuthProvider.credential)
+      var credential = firebase.auth.GoogleAuthProvider.credential(
+          googleUser.getAuthResponse().id_token);
+
+      // Sign in with credential from the Google user.
+      firebase.auth().signInWithCredential(credential).catch((error) => {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        // The email of the user's account used.
+        var email = error.email;
+        // The firebase.auth.AuthCredential type that was used.
+        var credential = error.credential;
+        // ...
+      });
+    } else {
+      console.log('User already signed-in Firebase.');
+    }
+  });
+}
+
+
+
+function isUserEqual(googleUser, firebaseUser) {
+  if (firebaseUser) {
+    var providerData = firebaseUser.providerData;
+    for (var i = 0; i < providerData.length; i++) {
+      if (providerData[i].providerId === firebase.auth.GoogleAuthProvider.PROVIDER_ID &&
+          providerData[i].uid === googleUser.getBasicProfile().getId()) {
+        // We don't need to reauth the Firebase connection.
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+// function authHandler() {
+//   firebase.auth()
+//     .signInWithPopup(provider)
+//     .then((result) => {
+//       /** @type {firebase.auth.OAuthCredential} */
+//       var credential = result.credential;
+
+//       // This gives you a Google Access Token. You can use it to access the Google API.
+//       var token = credential.accessToken;
+//       // The signed-in user info.
+//       var user = result.user;
+//       // ...
+//     }).catch((error) => {
+//       // Handle Errors here.
+//       var errorCode = error.code;
+//       var errorMessage = error.message;
+//       // The email of the user's account used.
+//       var email = error.email;
+//       // The firebase.auth.AuthCredential type that was used.
+//       var credential = error.credential;
+//       console.log(error);
+//       // ...
+//     });
+//   }
+
 const Login = () => {
   
   // Need to set the app element to body for screen-readers (disability), otherwise modal will throw an error
@@ -64,6 +138,10 @@ const Login = () => {
 
     console.log('clicked');
     authenticateUser(username, password);
+  }
+
+  function getAuthResponse(){
+    window.alert('booty, booty, booty, booty')
   }
   
   // callback function which will send request to endpoint http://localhost:3000/login and expect either SSID in cookie.
@@ -128,6 +206,8 @@ const Login = () => {
             <input type="submit"></input>
           </form>
           <button id="signup" onClick={openModal}>Sign Up</button>
+          {/* <button id="signinwithgoogle" onClick={authHandler}>Sign in with Google</button> */}
+          {/* <button className="g-signin2" onClick={onSignIn} data-theme="dark">Booty</button> */}
           <Modal
             isOpen={modalIsOpen}
             onRequestClose={closeModal}
