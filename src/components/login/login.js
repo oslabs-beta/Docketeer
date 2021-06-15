@@ -22,9 +22,102 @@ import * as actions from '../../actions/actions';
 import App from '../App';
 import SignupModal from './signupModal';
 import DebugRouter from '../debug/debugRouter';
+// Firebase App (the core Firebase SDK) is always required and must be listed first
+import firebase from 'firebase/app';
+// Add the Firebase products that you want to use
+import 'firebase/auth';
+
+const firebaseConfig = {
+  apiKey: 'AIzaSyAC8yoPq0llly4nbI-JOcYTglUhr2XhBkk',
+  authDomain: 'docketeer3-ef822.firebaseapp.com',
+  projectId: 'docketeer3-ef822',
+  storageBucket: 'docketeer3-ef822.appspot.com',
+  messagingSenderId: '517219389795',
+  appId: '1:517219389795:web:9a8dbd2232d94984dd4356',
+  measurementId: 'G-6MYEZ6RL7V'
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+
+// Get the Auth service for the default app
+var defaultAuth = firebase.auth();
+
+// var provider = new firebase.auth.GoogleAuthProvider();
+
+
+function onSignIn(googleUser) {
+  console.log('Google Auth Response', googleUser);
+  // We need to register an Observer on Firebase Auth to make sure auth is initialized.
+  var unsubscribe = firebase.auth().onAuthStateChanged((firebaseUser) => {
+    unsubscribe();
+    // Check if we are already signed-in Firebase with the correct user.
+    if (!isUserEqual(googleUser, firebaseUser)) {
+      // Build Firebase credential with the Google ID token.
+      // console.log('this gosh dawg turkey doag', firebase.auth.GoogleAuthProvider.PROVIDER_ID)
+      // console.log('this gosh dawg turkey bun', firebase.auth.GoogleAuthProvider.credential)
+      var credential = firebase.auth.GoogleAuthProvider.credential(
+        googleUser.getAuthResponse().id_token);
+
+      // Sign in with credential from the Google user.
+      firebase.auth().signInWithCredential(credential).catch((error) => {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        // The email of the user's account used.
+        var email = error.email;
+        // The firebase.auth.AuthCredential type that was used.
+        var credential = error.credential;
+        // ...
+      });
+    } else {
+      console.log('User already signed-in Firebase.');
+    }
+  });
+}
 
 // Helper Functions Import
 // import { handleLogin, authenticateUser } from '../helper/loginHelper';
+
+
+function isUserEqual(googleUser, firebaseUser) {
+  if (firebaseUser) {
+    var providerData = firebaseUser.providerData;
+    for (var i = 0; i < providerData.length; i++) {
+      if (providerData[i].providerId === firebase.auth.GoogleAuthProvider.PROVIDER_ID &&
+          providerData[i].uid === googleUser.getBasicProfile().getId()) {
+        // We don't need to reauth the Firebase connection.
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+// function authHandler() {
+//   firebase.auth()
+//     .signInWithPopup(provider)
+//     .then((result) => {
+//       /** @type {firebase.auth.OAuthCredential} */
+//       var credential = result.credential;
+
+//       // This gives you a Google Access Token. You can use it to access the Google API.
+//       var token = credential.accessToken;
+//       // The signed-in user info.
+//       var user = result.user;
+//       // ...
+//     }).catch((error) => {
+//       // Handle Errors here.
+//       var errorCode = error.code;
+//       var errorMessage = error.message;
+//       // The email of the user's account used.
+//       var email = error.email;
+//       // The firebase.auth.AuthCredential type that was used.
+//       var credential = error.credential;
+//       console.log(error);
+//       // ...
+//     });
+//   }
 
 const Login = () => {
   
@@ -133,6 +226,8 @@ const Login = () => {
             <input type="submit"></input>
           </form>
           <button id="signup" onClick={openModal}>Sign Up</button>
+          {/* <button id="signinwithgoogle" onClick={authHandler}>Sign in with Google</button> */}
+          {/* <button className="g-signin2" onClick={onSignIn} data-theme="dark">Booty</button> */}
           <Modal
             isOpen={modalIsOpen}
             onRequestClose={closeModal}
