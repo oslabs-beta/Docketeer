@@ -19,9 +19,24 @@ import IconButton from '@material-ui/core/IconButton';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import Checkbox from '@material-ui/core/Checkbox';
-
 // Redux Imports (actions)
 import * as actions from '../../actions/actions';
+
+import SignupModal from '../login/signupModal.js';
+import Modal from 'react-modal';
+import Button from '@material-ui/core/Button';
+
+// React Hooks: Local state variables 
+// const [ modalIsOpen, setIsOpen ] = useState(false);
+
+// Modal functions
+// const openModal = () => setIsOpen(true);
+// const closeModal = () => setIsOpen(false);
+
+// Need to set the app element to body for screen-readers (disability), otherwise modal will throw an error
+// useEffect(() => {
+//   Modal.setAppElement('body');
+// }, []);
 
 // Table Style Generator
 export const useStyles = makeStyles({
@@ -244,6 +259,9 @@ const UserTable = () => {
             </TableBody>
             <TableFooter>
               <TableRow>
+                <Button variant="contained" size="medium" className={classes.button} onClick={openModal}>
+                Sign Up
+                </Button>                
                 <TablePagination
                   rowsPerPageOptions={[5, 10, { label: 'All', value: -1 }]}
                   colSpan={10}
@@ -262,6 +280,13 @@ const UserTable = () => {
             </TableFooter>
           </Table>
         </TableContainer>
+        <Modal
+          isOpen={modalIsOpen}
+          onRequestClose={closeModal}
+          contentLabel='Modal to make user account'
+        >
+          <SignupModal closeModal={closeModal}/>
+        </Modal>
       </div>
     </div>
   );
