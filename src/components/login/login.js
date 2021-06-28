@@ -13,14 +13,12 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Switch, Route, Redirect, BrowserHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import Modal from 'react-modal';
 
 // Redux Imports (actions)
 import * as actions from '../../actions/actions';
 
 // React Component Imports
 import App from '../App';
-import SignupModal from './signupModal';
 import DebugRouter from '../debug/debugRouter';
 
 // Material UI Imports
@@ -50,21 +48,9 @@ const Login = () => {
 
   // React-Redux: Map state to props
   const session = useSelector((state) => state.session.isLoggedIn);
-
-  // React Hooks: Local state variables 
-  const [ modalIsOpen, setIsOpen ] = useState(false);
-
-  // Modal functions
-  const openModal = () => setIsOpen(true);
-  const closeModal = () => setIsOpen(false);
   
   // Material UI
   const classes = useStyles();
-
-  // Need to set the app element to body for screen-readers (disability), otherwise modal will throw an error
-  useEffect(() => {
-    Modal.setAppElement('body');
-  }, []);
   
   // callback function invoked when 'login' button is clicked
   const handleLogin = (e) => {
@@ -167,19 +153,19 @@ const Login = () => {
               </Button>
               <hr></hr>
               <div className="g-signin2" data-onsuccess="onSignIn" style={{width: '200px', borderRadius:'4px'}}></div>
-              <Button variant="contained" size="medium" className={classes.button} onClick={openModal}>
+              {/* <Button variant="contained" size="medium" className={classes.button} onClick={openModal}>
                 Sign Up
-              </Button>
+              </Button> */}
             </form>
           </div>
           {/* <button id="signup" onClick={openModal}>Sign Up</button> */}
-          <Modal
+          {/* <Modal
             isOpen={modalIsOpen}
             onRequestClose={closeModal}
             contentLabel='Modal to make user account'
           >
             <SignupModal closeModal={closeModal}/>
-          </Modal>
+          </Modal> */}
         </div>
       </Route>
     </Router>

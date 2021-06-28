@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
+import store from '../../renderer/store.js';
 
 // Material UI imports
 import { makeStyles, useTheme } from '@material-ui/core/styles';
@@ -25,18 +26,6 @@ import * as actions from '../../actions/actions';
 import SignupModal from '../login/signupModal.js';
 import Modal from 'react-modal';
 import Button from '@material-ui/core/Button';
-
-// React Hooks: Local state variables 
-// const [ modalIsOpen, setIsOpen ] = useState(false);
-
-// Modal functions
-// const openModal = () => setIsOpen(true);
-// const closeModal = () => setIsOpen(false);
-
-// Need to set the app element to body for screen-readers (disability), otherwise modal will throw an error
-// useEffect(() => {
-//   Modal.setAppElement('body');
-// }, []);
 
 // Table Style Generator
 export const useStyles = makeStyles({
@@ -64,7 +53,7 @@ function TablePaginationActions(props) {
   };
 
   const handleBackButtonClick = (event) => {
-    onChangePage(event, page - 1);
+    onChangePage                                                                                                                        (event, page - 1);
   };
 
   const handleNextButtonClick = (event) => {
@@ -116,9 +105,11 @@ TablePaginationActions.propTypes = {
 const UserTable = () => {
 
   const classes = useStyles();
+  const [userList, setUserList] = useState();
   const rows = useSelector((state) => state.userList.userList);
   const dispatch = useDispatch();
   const updateUserRole = (data) => dispatch(actions.updateUserRole(data));
+  // const updateUserList = (userList) => dispatch(actions.updateUserList(userList));
 
   const tempSelected = {};
   for (let i = 0; i < rows.length; i++){
@@ -144,7 +135,24 @@ const UserTable = () => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
- 
+
+  // React Hooks: Local state variables 
+  const [ modalIsOpen, setIsOpen ] = useState(false);
+  // const [userList, setUserList] = useState();
+
+  // Modal functions
+  const openModal = () => setIsOpen(true);
+  const closeModal = () => {
+    setIsOpen(false);
+    // updateUserList();
+  };
+  console.log(store.getState() ,'store');
+  // Need to set the app element to body for screen-readers (disability), otherwise modal will throw an error
+  useEffect(() => {
+    Modal.setAppElement('body');
+  }, []);
+
+
   const handleCheckboxClick = (event) => {
     // event persist is required to access target property of event. Without this, a synthetic event object would be used where target is re-assigned to null for performance reasons
     event.persist();
