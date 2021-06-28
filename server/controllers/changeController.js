@@ -15,10 +15,10 @@ const db = require('../models/cloudModel');
 const changeController = {};
 
 changeController.changePassword = (req, res, next) => {
-  const { newPass } = req.body;
+  const { newPass, user } = req.body;
   const { hash } = res.locals;
   const query = 'UPDATE users SET password = $1 WHERE username = $2';
-  const params = [newPass, hash];
+  const params = [hash, user];
   db.query(query, params);
   next();
 }

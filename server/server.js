@@ -33,6 +33,7 @@ app.use('/login', loginRouter);
 app.use('/admin', adminRouter);
 app.use('/account', accountRouter);
 app.use('/change', changeRouter);
+app.use('/db', dbRouter);
 
 // Unknown Endpoint Error Handler
 app.use('/', (req, res) => {

@@ -20,11 +20,14 @@ const dbController = require('../controllers/dbController');
 const router = express.Router();
  
 router.use('/',
+  // dbController.createRoles,
+  dbController.insertRoles,
   dbController.createTable,
-  dbController.createRoles,
+  dbController.insertAdmin,
   (req, res) => {
  
-    if (res.locals.error) return res.status(200).json(res.locals);
+    // if (res.locals.error) return res.status(200).json(res.locals);
+    console.log('in dbrouter!');
     return res.status(200).json('Database initialized successfully');
   }
 );
