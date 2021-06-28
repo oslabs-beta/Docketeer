@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
+import store from '../../renderer/store.js';
+
 // Material UI imports
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
@@ -18,9 +20,12 @@ import IconButton from '@material-ui/core/IconButton';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import Checkbox from '@material-ui/core/Checkbox';
-
 // Redux Imports (actions)
 import * as actions from '../../actions/actions';
+
+import SignupModal from '../login/signupModal.js';
+import Modal from 'react-modal';
+import Button from '@material-ui/core/Button';
 
 // Table Style Generator
 export const useStyles = makeStyles({
@@ -48,7 +53,7 @@ function TablePaginationActions(props) {
   };
 
   const handleBackButtonClick = (event) => {
-    onChangePage(event, page - 1);
+    onChangePage                                                                                                                        (event, page - 1);
   };
 
   const handleNextButtonClick = (event) => {
@@ -100,9 +105,11 @@ TablePaginationActions.propTypes = {
 const UserTable = () => {
 
   const classes = useStyles();
+  const [userList, setUserList] = useState();
   const rows = useSelector((state) => state.userList.userList);
   const dispatch = useDispatch();
   const updateUserRole = (data) => dispatch(actions.updateUserRole(data));
+  // const updateUserList = (userList) => dispatch(actions.updateUserList(userList));
 
   const tempSelected = {};
   for (let i = 0; i < rows.length; i++){
@@ -128,7 +135,24 @@ const UserTable = () => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
- 
+
+  // React Hooks: Local state variables 
+  const [ modalIsOpen, setIsOpen ] = useState(false);
+  // const [userList, setUserList] = useState();
+
+  // Modal functions
+  const openModal = () => setIsOpen(true);
+  const closeModal = () => {
+    setIsOpen(false);
+    // updateUserList();
+  };
+  console.log(store.getState() ,'store');
+  // Need to set the app element to body for screen-readers (disability), otherwise modal will throw an error
+  useEffect(() => {
+    Modal.setAppElement('body');
+  }, []);
+
+
   const handleCheckboxClick = (event) => {
     // event persist is required to access target property of event. Without this, a synthetic event object would be used where target is re-assigned to null for performance reasons
     event.persist();
@@ -183,76 +207,96 @@ const UserTable = () => {
   };
 
   return (
-    <TableContainer component={Paper}>
-      <Table className={classes.table} aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <TableCell>id</TableCell>
-            <TableCell>Username</TableCell>
-            <TableCell>Email</TableCell>
-            <TableCell>Phone</TableCell>
-            <TableCell>Role</TableCell>
-            <TableCell>Contact Preference</TableCell>
-            <TableCell>Memory Threshold</TableCell>
-            <TableCell>CPU Threshold</TableCell>
-            <TableCell>Admin</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {(rowsPerPage > 0
-            ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            : rows
-          ).map((row, index) => {
-            // const isItemSelected = isSelected(row.name);
-            const labelId = `enhanced-table-checkbox-${index}`;
-            return (
-              <TableRow 
-                key={row._id}
-                hover
-              >
-                <TableCell component="th" scope="row">
-                  {row._id}
-                </TableCell>
-                <TableCell>{row.username}</TableCell>
-                <TableCell>{row.email}</TableCell>
-                <TableCell>{row.phone}</TableCell>
-                <TableCell>{row.role}</TableCell>
-                <TableCell>{row.contact_pref}</TableCell>
-                <TableCell>{row.mem_threshold}</TableCell>
-                <TableCell>{row.cpu_threshold}</TableCell>
-                <TableCell>
-                  <Checkbox 
-                    id={`${row._id}`}
-                    userid={`${row._id}`}
-                    checked={selected[row._id]}
-                    inputProps={{ 'aria-labelledby': labelId }}
-                    onChange={handleCheckboxClick}
-                  />
-                </TableCell>
+    <div className="renderContainers">
+      <div className="header">
+        <h1 className="tabTitle">Users</h1>
+      </div>
+      <div className="metric-section-title">
+        <h3>List of Users in Docketeer</h3>
+      </div>
+      <div className="settings-containers">
+        <TableContainer component={Paper}>
+          <Table className={classes.table} aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell>id</TableCell>
+                <TableCell>Username</TableCell>
+                <TableCell>Email</TableCell>
+                <TableCell>Phone</TableCell>
+                <TableCell>Role</TableCell>
+                <TableCell>Contact Preference</TableCell>
+                <TableCell>Memory Threshold</TableCell>
+                <TableCell>CPU Threshold</TableCell>
+                <TableCell>Admin</TableCell>
               </TableRow>
-            );})}
-          
-        </TableBody>
-        <TableFooter>
-          <TableRow>
-            <TablePagination
-              rowsPerPageOptions={[5, 10, { label: 'All', value: -1 }]}
-              colSpan={10}
-              count={rows.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              SelectProps={{
-                inputProps: { 'aria-label': 'rows per page' },
-                native: true,
-              }}
-              onChangePage={handleChangePage}
-              onChangeRowsPerPage={handleChangeRowsPerPage}
-              ActionsComponent={TablePaginationActions}
-            />
-          </TableRow>
-        </TableFooter>
-      </Table>
-    </TableContainer>
+            </TableHead>
+            <TableBody>
+              {(rowsPerPage > 0
+                ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                : rows
+              ).map((row, index) => {
+                // const isItemSelected = isSelected(row.name);
+                const labelId = `enhanced-table-checkbox-${index}`;
+                return (
+                  <TableRow 
+                    key={row._id}
+                    hover
+                  >
+                    <TableCell component="th" scope="row">
+                      {row._id}
+                    </TableCell>
+                    <TableCell>{row.username}</TableCell>
+                    <TableCell>{row.email}</TableCell>
+                    <TableCell>{row.phone}</TableCell>
+                    <TableCell>{row.role}</TableCell>
+                    <TableCell>{row.contact_pref}</TableCell>
+                    <TableCell>{row.mem_threshold}</TableCell>
+                    <TableCell>{row.cpu_threshold}</TableCell>
+                    <TableCell>
+                      <Checkbox 
+                        id={`${row._id}`}
+                        userid={`${row._id}`}
+                        checked={selected[row._id]}
+                        inputProps={{ 'aria-labelledby': labelId }}
+                        onChange={handleCheckboxClick}
+                      />
+                    </TableCell>
+                  </TableRow>
+                );})}
+              
+            </TableBody>
+            <TableFooter>
+              <TableRow>
+                <Button variant="contained" size="medium" className={classes.button} onClick={openModal}>
+                Sign Up
+                </Button>                
+                <TablePagination
+                  rowsPerPageOptions={[5, 10, { label: 'All', value: -1 }]}
+                  colSpan={10}
+                  count={rows.length}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  SelectProps={{
+                    inputProps: { 'aria-label': 'rows per page' },
+                    native: true,
+                  }}
+                  onChangePage={handleChangePage}
+                  onChangeRowsPerPage={handleChangeRowsPerPage}
+                  ActionsComponent={TablePaginationActions}
+                />
+              </TableRow>
+            </TableFooter>
+          </Table>
+        </TableContainer>
+        <Modal
+          isOpen={modalIsOpen}
+          onRequestClose={closeModal}
+          contentLabel='Modal to make user account'
+        >
+          <SignupModal closeModal={closeModal}/>
+        </Modal>
+      </div>
+    </div>
   );
 };
 

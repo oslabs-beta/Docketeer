@@ -346,16 +346,22 @@ const Settings = (props) => {
       );
     }
   };
+
+  // Redux: Map state to props
+  const _id = useSelector((state) => state.session._id);
+  const mem_threshold = useSelector((state) => state.session.mem_threshold);
+  const cpu_threshold = useSelector((state) => state.session.cpu_threshold);
+  const container_stops = useSelector((state) => state.session.container_stops);
+  const contact_pref = useSelector((state) => state.session.contact_pref);
+
   // Local state variables to hold cpuThreshold, memThreshold, stoppedContainers, however should move to Redux session state variables
-  const [ cpuThreshold, setCpuThreshold ] = useState('80');
-  const [ memThreshold, setMemThreshold ] = useState('80');
-  const [ stoppedContainers, setStoppedContainers ] = useState(false);
-  const [value, setValue] = useState('email');
+  const [ cpuThreshold, setCpuThreshold ] = useState(cpu_threshold);
+  const [ memThreshold, setMemThreshold ] = useState(mem_threshold);
+  const [ stoppedContainers, setStoppedContainers ] = useState(container_stops);
+  const [value, setValue] = useState(contact_pref);
 
   const dispatch = useDispatch();
   const updateUser = (userInfo) => dispatch(actions.updateUser(userInfo));
-
-  const _id = useSelector((state) => state.session._id);
 
   const handleRadioChange = (event) => {
     setValue(event.target.value);
@@ -751,6 +757,7 @@ const Settings = (props) => {
               variant="outlined"
               // value="80" set this later
               onChange={handleCpuChange}
+              placeholder={`${cpu_threshold}`}
               size="small"
             />
             <Button
@@ -769,6 +776,7 @@ const Settings = (props) => {
               helperText="* 80% memory recommended"
               variant="outlined"
               onChange={handleMemChange}
+              placeholder={`${mem_threshold}`}
               // value="80" set this later
               size="small"
             />

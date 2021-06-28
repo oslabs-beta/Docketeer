@@ -97,3 +97,4 @@ ipcMain.handle('post-event', async (_, args) => {
   const { mobileNumber, triggeringEvent } = args;
   return await postEvent(mobileNumber, triggeringEvent);
 });
+

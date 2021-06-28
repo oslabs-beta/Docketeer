@@ -13,18 +13,31 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Switch, Route, Redirect, BrowserHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import Modal from 'react-modal';
 
 // Redux Imports (actions)
 import * as actions from '../../actions/actions';
 
 // React Component Imports
 import App from '../App';
-import SignupModal from './signupModal';
 import DebugRouter from '../debug/debugRouter';
 
+// Material UI Imports
+import { makeStyles } from '@material-ui/core/styles';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
+
+import Docketeer from '../../../assets/docketeer-title.png';
 // Helper Functions Import
 // import { handleLogin, authenticateUser } from '../helper/loginHelper';
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    '& > *': {
+      margin: theme.spacing(1),
+      width: '25ch',
+    },
+  },
+}));
 
 const Login = () => {
   
@@ -35,18 +48,9 @@ const Login = () => {
 
   // React-Redux: Map state to props
   const session = useSelector((state) => state.session.isLoggedIn);
-
-  // React Hooks: Local state variables 
-  const [ modalIsOpen, setIsOpen ] = useState(false);
-
-  // Modal functions
-  const openModal = () => setIsOpen(true);
-  const closeModal = () => setIsOpen(false);
   
-  // Need to set the app element to body for screen-readers (disability), otherwise modal will throw an error
-  useEffect(() => {
-    Modal.setAppElement('body');
-  }, []);
+  // Material UI
+  const classes = useStyles();
   
   // callback function invoked when 'login' button is clicked
   const handleLogin = (e) => {
@@ -123,23 +127,45 @@ const Login = () => {
       history={BrowserHistory}
     >
       <Route id="route" path="/"> 
-        <div>
-          <h1>Login</h1>
-          <form onSubmit={handleLogin}>
-            <input id="username" type="text" placeholder="username"></input>
-            <br></br>
-            <input id="password" type="password" placeholder="password"></input>
-            <br></br>
-            <input type="submit"></input>
-          </form>
-          <button id="signup" onClick={openModal}>Sign Up</button>
-          <Modal
+        <header>
+          <img src={Docketeer} width={160} />
+        </header>
+        <br></br>
+        <br></br>
+        <br></br>
+        <div className="renderContainers">
+          <div className="header">
+            <h1 className="tabTitle">Login</h1>
+          </div>
+          <div className="settings-container">
+            <form className={classes.root} onSubmit={handleLogin}>
+              {/* <input id="username" type="text" placeholder="username"></input> */}
+              <TextField id="username" label="Username" variant="outlined" />
+              <br></br>
+              <br></br>
+              {/* <input id="password" type="password" placeholder="password"></input> */}
+              <TextField id="password" label="Password" type="password" variant="outlined" />
+              {/* <input type="submit"></input> */}
+              <br></br>
+              <br></br>
+              <Button variant="contained" color="primary" type="submit" size="medium" className={classes.button}>
+                Login
+              </Button>
+              <hr></hr>
+              <div className="g-signin2" data-onsuccess="onSignIn" style={{width: '200px', borderRadius:'4px'}}></div>
+              {/* <Button variant="contained" size="medium" className={classes.button} onClick={openModal}>
+                Sign Up
+              </Button> */}
+            </form>
+          </div>
+          {/* <button id="signup" onClick={openModal}>Sign Up</button> */}
+          {/* <Modal
             isOpen={modalIsOpen}
             onRequestClose={closeModal}
             contentLabel='Modal to make user account'
           >
             <SignupModal closeModal={closeModal}/>
-          </Modal>
+          </Modal> */}
         </div>
       </Route>
     </Router>
