@@ -8,6 +8,8 @@
   "main": "./src/main/main.js",
   "scripts": {
     "dev": "cross-env NODE_ENV=development concurrently 'electron-webpack dev' 'nodemon server/server.js'",
+    "windev": "cross-env NODE_ENV=developement electron-webpack dev",
+    "server": "node server/server.js",
     "compile": "electron-webpack",
     "dist": "npm run compile && electron-builder",
     "dist-win": "npm run compile && electron-builder --win --x64",

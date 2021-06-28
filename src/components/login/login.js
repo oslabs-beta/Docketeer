@@ -64,6 +64,7 @@ const Login = () => {
   // Need to set the app element to body for screen-readers (disability), otherwise modal will throw an error
   useEffect(() => {
     Modal.setAppElement('body');
+    fetch('http://localhost:3000/db');
   }, []);
   
   // callback function invoked when 'login' button is clicked

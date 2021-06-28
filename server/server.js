@@ -18,6 +18,8 @@ const signupRouter = require('./routes/signupRouter');
 const loginRouter = require('./routes/loginRouter');
 const adminRouter = require('./routes/adminRouter');
 const accountRouter = require('./routes/accountRouter');
+const changeRouter = require('./routes/changeRouter');
+const dbRouter = require('./routes/dbRouter');
 
 const app = express();
 const PORT = 3000;
@@ -30,6 +32,8 @@ app.use('/signup', signupRouter);
 app.use('/login', loginRouter);
 app.use('/admin', adminRouter);
 app.use('/account', accountRouter);
+app.use('/change', changeRouter);
+app.use('/db', dbRouter);
 
 // Unknown Endpoint Error Handler
 app.use('/', (req, res) => {
