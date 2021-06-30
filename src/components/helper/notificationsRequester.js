@@ -7,14 +7,21 @@ import thresholdBreach from './EventEmitter.js';
 const sentNotifications = {};
 let state;
 
-const Event = require('events');
-const MemThreshold = new Event;
+
+//I was onroute to implementing ipcRenderer, but a more traditional event emitter is imported on line 12, 13
+//I believe I've implement ipcRenderer, but haven't checked it, likely some bugs.
+//go to EmailPost.js to see routing of fetch request and ipcMain.handle logic (handling 
+//the events emitted from ipcRenderer) see line 112-125 for more details
+
+
+// const Event = require('events');
+// const MemThreshold = new Event;
 
 /**
  * The amount of seconds to wait before resend notification
  * when container problem has not been addressed
  */
-const RESEND_INTERVAL = onchange; ////?////// seconds
+const RESEND_INTERVAL = 60; /// /?////// seconds
 
 const getTargetStat = (containerObject, notificationSettingType) => {
   if (notificationSettingType === categories.MEMORY)
@@ -70,13 +77,18 @@ const constructNotificationMessage = (
 
   return message;
 };
-MemThreshold.on('Memory-Usage', thresholdBreach); // creates an Event called MemThreshold tied to the memAndProcessThresholdEvent function
 
-// ProcessingThreshold.on('Process-Usage', processingTotAndUse)
+// notes below for a more traditional event emitter.
+// //Creates an event called Memory-Usage and invokes the sendNotification function when an event is emitted.
 
-MemThreshold.emit(onchange, 'Memory-Usage');
+// MemThreshold.on('Memory-Usage', sendNotification); 
 
-//    Above is only for stopped containers
+
+
+// MemThreshold.emit(storeState.session.email, 'Memory-Usage');
+// when the email is read in the state, memory usage will be emitted
+
+
 
 // this function will make a request that will trigger a notification
 const sendNotification = async (
@@ -85,6 +97,9 @@ const sendNotification = async (
   stat,
   triggeringValue
 ) => {
+
+  // adding current state
+  const storeState = store.getState();
   // request notification
   const body = {
     mobileNumber: state.notificationList.phoneNumber,
@@ -95,9 +110,45 @@ const sendNotification = async (
       containerId
     ),
   };
+  if(storeState.session.email){
+    const emailBody = {
 
+      email: storeState.session.email,
+      triggeringEvent: constructNotificationMessage(
+        notificationType,
+        stat,
+        triggeringValue,
+        containerId
+      )
+    };
+    await ipcRenderer.invoke( 'Memory-Usage', emailBody );
+  }
+  
+  
+  // the first argument would be the name of the event handled in ipcMain.handle (line 124 )
   await ipcRenderer.invoke('post-event', body);
 };
+
+
+
+/// BELOW ARE NOTES ON THE ipcRenderer EVENT EMITTER FROM ELECTRON
+
+// LINK IN ELECTRON DOCS FOR IPC RENDERER
+// https://www.electronjs.org/docs/api/ipc-renderer
+
+
+// EXAMPLE OF SYNTAX TAKEN FROM LINK ABOVE
+// ipcRenderer.invoke('some-name', someArgument).then((result) => {
+//   // ...
+// })
+
+// // Main process
+// ipcMain.handle('some-name', async (event, someArgument) => {
+//   const result = await doSomeWork(someArgument)
+//   return result
+// })
+
+
 
 /**
  * Returns the DateTime the last notification was sent per notification type, per containerId
