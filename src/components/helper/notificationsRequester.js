@@ -2,34 +2,36 @@
 import { ipcRenderer } from 'electron';
 import store from '../../renderer/store';
 import * as categories from '../../constants/notificationCategories';
-
+import thresholdBreach from './EventEmitter.js';
 // object that holds what notifications have been sent
 const sentNotifications = {};
 let state;
+
+const Event = require('events');
+const MemThreshold = new Event;
 
 /**
  * The amount of seconds to wait before resend notification
  * when container problem has not been addressed
  */
-const RESEND_INTERVAL = 60; // seconds
+const RESEND_INTERVAL = onchange; ////?////// seconds
 
 const getTargetStat = (containerObject, notificationSettingType) => {
-  // note: this was previously returning an error because each conditional was trying to access a property on the containerObject that did not exist
-  // e.g., containerObject.mp, containerObject.cpu, etc.
-  // fix was to change it to actual properties, like containerObject.MemPerc, containerObject.CPUPerc, etc.
   if (notificationSettingType === categories.MEMORY)
-    return parseFloat(containerObject.MemPerc.replace('%', ''));
+    return parseFloat(containerObject.mp.replace('%', ''));
   if (notificationSettingType === categories.CPU)
-    return parseFloat(containerObject.CPUPerc.replace('%', ''));
+    return parseFloat(containerObject.cpu.replace('%', ''));
   if (notificationSettingType === categories.STOPPED) return 1;
 };
 
 const getContainerObject = (containerList, containerId) => {
+  // console.log('GET CONTAINER OBJECT: ', containerList, containerId);
   for (let i = 0; i < containerList.length; i += 1) {
     const containerObject = containerList[i];
-    // note: this conditional was previously checking for containerObject.cid === containerId, but cid is not a property on containerObject, resulting in undefined being returned every time.
-    // changed from containerObject.cid to containerObject.ID
-    if (containerObject.ID === containerId) return containerObject;
+    // console.log('containerObject: ', containerList[i]);
+    // console.log('CID: ', containerObject.cid);
+    console.log('ID: ', containerObject.ID);
+    if (containerObject.cid === containerId) return containerObject;
   }
   // container not present in container list (ex: running or stopped notificationList)
   return undefined;
@@ -68,6 +70,13 @@ const constructNotificationMessage = (
 
   return message;
 };
+MemThreshold.on('Memory-Usage', thresholdBreach); // creates an Event called MemThreshold tied to the memAndProcessThresholdEvent function
+
+// ProcessingThreshold.on('Process-Usage', processingTotAndUse)
+
+MemThreshold.emit(onchange, 'Memory-Usage');
+
+//    Above is only for stopped containers
 
 // this function will make a request that will trigger a notification
 const sendNotification = async (
@@ -78,7 +87,7 @@ const sendNotification = async (
 ) => {
   // request notification
   const body = {
-    mobileNumber: state.session.phone,
+    mobileNumber: state.notificationList.phoneNumber,
     triggeringEvent: constructNotificationMessage(
       notificationType,
       stat,
@@ -110,20 +119,16 @@ const checkForNotifications = (
   containerList,
   triggeringValue
 ) => {
-  // if(notificationType === 'MEMORY'){
-  //   console.log('--------checkForNotifications---------');
-  //   console.log('Type: ', notificationType);
-  //   console.log('Threshold %: ', triggeringValue);
-  //   console.log('Container List: ', containerList);
-  //   console.log('Notifs Settings Set: ', notificationSettingsSet);
-  // }
+  if(notificationType === 'MEMORY'){
+    console.log('checkForNotifications: ', notificationType, ' ', triggeringValue);
+    console.log(containerList, notificationType);
+    console.log('notificationSettingsSet: ', notificationSettingsSet);
+  }
   // scan notification settings
   notificationSettingsSet.forEach((containerId) => {
     // check container metrics if it is seen in either runningList or stoppedList
     const containerObject = getContainerObject(containerList, containerId);
-    // if (notificationType === 'MEMORY'){
-    //   console.log('CONTAINER OBJECT: ', containerObject);
-    // }
+    // console.log('CONTAINER OBJECT ', notificationType, containerObject);
     if (containerObject) {
       // gets the stat/metric on the container that we want to test
       const stat = getTargetStat(containerObject, notificationType);
@@ -142,7 +147,7 @@ const checkForNotifications = (
           const spentTime = Math.floor(
             (Date.now() - notificationLastSent) / 1000
           );
-
+          thresholdBreach();
           // check if enough time (RESEND_INTERVAL) has passed since laster notification sent.
           if (spentTime > RESEND_INTERVAL) {
             // send nofication
